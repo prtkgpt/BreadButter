@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -107,7 +107,7 @@ const contractTemplates = [
   },
 ];
 
-export default function NewContractPage() {
+function NewContractForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedClientId = searchParams.get("clientId");
@@ -251,16 +251,16 @@ export default function NewContractPage() {
                 <div className="space-y-2">
                   <Label htmlFor="projectId">Project (optional)</Label>
                   <Select
-                    value={formData.projectId}
+                    value={formData.projectId || "none"}
                     onValueChange={(value) =>
-                      setFormData({ ...formData, projectId: value })
+                      setFormData({ ...formData, projectId: value === "none" ? "" : value })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a project" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No project</SelectItem>
+                      <SelectItem value="none">No project</SelectItem>
                       {filteredProjects.map((project) => (
                         <SelectItem key={project.id} value={project.id}>
                           {project.name}
@@ -358,5 +358,13 @@ export default function NewContractPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function NewContractPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8">Loading...</div>}>
+      <NewContractForm />
+    </Suspense>
   );
 }

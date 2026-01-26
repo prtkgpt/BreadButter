@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ interface Client {
   email: string;
 }
 
-export default function NewProjectPage() {
+function NewProjectForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedClientId = searchParams.get("clientId");
@@ -322,5 +322,13 @@ export default function NewProjectPage() {
         </Card>
       </form>
     </div>
+  );
+}
+
+export default function NewProjectPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8">Loading...</div>}>
+      <NewProjectForm />
+    </Suspense>
   );
 }
