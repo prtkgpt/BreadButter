@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { clients, projects, invoices, contracts, proposals, smartFiles } from "@/lib/schema";
+import { clients, projects, invoices, contracts, proposals } from "@/lib/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,9 +13,11 @@ import {
   FileText,
   Download,
   ExternalLink,
-  CheckCircle,
   Clock,
 } from "lucide-react";
+import Image from "next/image";
+
+export const dynamic = "force-dynamic";
 
 export default async function ClientPortalPage({
   params,
@@ -103,10 +105,12 @@ export default async function ClientPortalPage({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               {client.user?.logo ? (
-                <img
+                <Image
                   src={client.user.logo}
                   alt={client.user.businessName || ""}
-                  className="h-10 w-10 rounded-full"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-full object-cover"
                 />
               ) : (
                 <div
