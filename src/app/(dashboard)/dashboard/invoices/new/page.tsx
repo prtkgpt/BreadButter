@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,7 @@ interface InvoiceItem {
   unitPrice: string;
 }
 
-export default function NewInvoicePage() {
+function NewInvoiceForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedClientId = searchParams.get("clientId");
@@ -443,5 +443,13 @@ export default function NewInvoicePage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function NewInvoicePage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8">Loading...</div>}>
+      <NewInvoiceForm />
+    </Suspense>
   );
 }
