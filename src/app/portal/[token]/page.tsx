@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { clients, projects, invoices, contracts, proposals, smartFiles } from "@/lib/schema";
+import { clients, projects, invoices, contracts, proposals } from "@/lib/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,8 @@ import {
   CheckCircle,
   Clock,
 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default async function ClientPortalPage({
   params,

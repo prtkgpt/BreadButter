@@ -33,73 +33,77 @@ const contractTemplates = [
   {
     id: "photography",
     name: "Photography Services",
-    content: `PHOTOGRAPHY SERVICES AGREEMENT
-
-This Photography Services Agreement ("Agreement") is entered into as of {{DATE}} between {{BUSINESS_NAME}} ("Photographer") and {{CLIENT_NAME}} ("Client").
-
-1. SERVICES
-The Photographer agrees to provide photography services for:
-Event/Session Type: {{PROJECT_TYPE}}
-Date: {{EVENT_DATE}}
-Location: {{EVENT_LOCATION}}
-
-2. PAYMENT
-Total Fee: ${{TOTAL_VALUE}}
-Payment Schedule:
-- 50% deposit due upon signing
-- Remaining balance due before/on the event date
-
-3. CANCELLATION POLICY
-- Cancellation 30+ days before event: Full deposit refund
-- Cancellation 14-29 days before event: 50% deposit retained
-- Cancellation less than 14 days: Full deposit retained
-
-4. IMAGE RIGHTS
-The Photographer retains copyright to all images. Client receives a personal use license for the delivered images.
-
-5. LIABILITY
-The Photographer's liability is limited to the total amount paid under this Agreement.
-
-By signing below, both parties agree to the terms outlined in this Agreement.
-
-_________________________          _________________________
-Photographer Signature               Client Signature
-
-Date: ________________              Date: ________________`,
+    content: [
+      "PHOTOGRAPHY SERVICES AGREEMENT",
+      "",
+      'This Photography Services Agreement ("Agreement") is entered into as of [DATE] between [BUSINESS_NAME] ("Photographer") and [CLIENT_NAME] ("Client").',
+      "",
+      "1. SERVICES",
+      "The Photographer agrees to provide photography services for:",
+      "Event/Session Type: [PROJECT_TYPE]",
+      "Date: [EVENT_DATE]",
+      "Location: [EVENT_LOCATION]",
+      "",
+      "2. PAYMENT",
+      "Total Fee: $[TOTAL_VALUE]",
+      "Payment Schedule:",
+      "- 50% deposit due upon signing",
+      "- Remaining balance due before/on the event date",
+      "",
+      "3. CANCELLATION POLICY",
+      "- Cancellation 30+ days before event: Full deposit refund",
+      "- Cancellation 14-29 days before event: 50% deposit retained",
+      "- Cancellation less than 14 days: Full deposit retained",
+      "",
+      "4. IMAGE RIGHTS",
+      "The Photographer retains copyright to all images. Client receives a personal use license for the delivered images.",
+      "",
+      "5. LIABILITY",
+      "The Photographer's liability is limited to the total amount paid under this Agreement.",
+      "",
+      "By signing below, both parties agree to the terms outlined in this Agreement.",
+      "",
+      "_________________________          _________________________",
+      "Photographer Signature               Client Signature",
+      "",
+      "Date: ________________              Date: ________________",
+    ].join("\n"),
   },
   {
     id: "general",
     name: "General Services",
-    content: `GENERAL SERVICES AGREEMENT
-
-This Services Agreement ("Agreement") is entered into as of {{DATE}} between {{BUSINESS_NAME}} ("Service Provider") and {{CLIENT_NAME}} ("Client").
-
-1. SCOPE OF SERVICES
-The Service Provider agrees to provide the following services:
-{{PROJECT_DESCRIPTION}}
-
-2. COMPENSATION
-Total Fee: ${{TOTAL_VALUE}}
-Payment Terms: Net 14
-
-3. TERM
-This Agreement begins on {{START_DATE}} and continues until services are completed.
-
-4. TERMINATION
-Either party may terminate this Agreement with 14 days written notice.
-
-5. CONFIDENTIALITY
-Both parties agree to keep confidential information private.
-
-6. LIABILITY
-Service Provider's liability is limited to the total amount paid under this Agreement.
-
-By signing below, both parties agree to the terms outlined in this Agreement.
-
-_________________________          _________________________
-Service Provider Signature           Client Signature
-
-Date: ________________              Date: ________________`,
+    content: [
+      "GENERAL SERVICES AGREEMENT",
+      "",
+      'This Services Agreement ("Agreement") is entered into as of [DATE] between [BUSINESS_NAME] ("Service Provider") and [CLIENT_NAME] ("Client").',
+      "",
+      "1. SCOPE OF SERVICES",
+      "The Service Provider agrees to provide the following services:",
+      "[PROJECT_DESCRIPTION]",
+      "",
+      "2. COMPENSATION",
+      "Total Fee: $[TOTAL_VALUE]",
+      "Payment Terms: Net 14",
+      "",
+      "3. TERM",
+      "This Agreement begins on [START_DATE] and continues until services are completed.",
+      "",
+      "4. TERMINATION",
+      "Either party may terminate this Agreement with 14 days written notice.",
+      "",
+      "5. CONFIDENTIALITY",
+      "Both parties agree to keep confidential information private.",
+      "",
+      "6. LIABILITY",
+      "Service Provider's liability is limited to the total amount paid under this Agreement.",
+      "",
+      "By signing below, both parties agree to the terms outlined in this Agreement.",
+      "",
+      "_________________________          _________________________",
+      "Service Provider Signature           Client Signature",
+      "",
+      "Date: ________________              Date: ________________",
+    ].join("\n"),
   },
 ];
 
@@ -324,7 +328,7 @@ export default function NewContractPage() {
             <CardHeader>
               <CardTitle>Contract Content</CardTitle>
               <CardDescription>
-                Write or edit your contract terms. Use placeholders like {`{{CLIENT_NAME}}`} for dynamic content.
+                Write or edit your contract terms. Use placeholders like [CLIENT_NAME] for dynamic content.
               </CardDescription>
             </CardHeader>
             <CardContent>
