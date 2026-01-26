@@ -58,6 +58,25 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     console.error("Registration error:", error);
+
+    // Provide more specific error messages
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+
+    // Check for common database errors
+    if (errorMessage.includes("relation") && errorMessage.includes("does not exist")) {
+      return NextResponse.json(
+        { error: "Database not initialized. Please run migrations." },
+        { status: 500 }
+      );
+    }
+
+    if (errorMessage.includes("connect") || errorMessage.includes("ECONNREFUSED")) {
+      return NextResponse.json(
+        { error: "Cannot connect to database. Please check your configuration." },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Something went wrong. Please try again." },
       { status: 500 }
