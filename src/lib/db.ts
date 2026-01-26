@@ -2,6 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
+// Create db connection on demand (for serverless)
 export function getDb() {
   const url = process.env.DATABASE_URL;
   if (!url) {
@@ -10,13 +11,18 @@ export function getDb() {
   return drizzle(neon(url), { schema });
 }
 
-// For backwards compatibility - creates new connection each call
-export const db = {
-  get query() {
-    return getDb().query;
+// Singleton for the current request
+let _db: ReturnType<typeof getDb> | null = null;
+
+export const db = new Proxy({} as ReturnType<typeof getDb>, {
+  get(_, prop: string | symbol) {
+    if (!_db) {
+      _db = getDb();
+    }
+    const value = _db[prop as keyof typeof _db];
+    if (typeof value === "function") {
+      return value.bind(_db);
+    }
+    return value;
   },
-  insert: (...args: Parameters<ReturnType<typeof getDb>["insert"]>) => getDb().insert(...args),
-  update: (...args: Parameters<ReturnType<typeof getDb>["update"]>) => getDb().update(...args),
-  delete: (...args: Parameters<ReturnType<typeof getDb>["delete"]>) => getDb().delete(...args),
-  select: (...args: Parameters<ReturnType<typeof getDb>["select"]>) => getDb().select(...args),
-};
+});
