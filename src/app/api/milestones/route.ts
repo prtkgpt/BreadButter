@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         name,
         description,
         amount: amount.toString(),
-        dueDate: dueDate ? new Date(dueDate) : null,
+        dueDate: dueDate || null,
         deliverables: deliverables || [],
         sortOrder: existingMilestones.length,
         status: "pending",
