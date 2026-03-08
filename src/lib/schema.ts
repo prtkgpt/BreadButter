@@ -691,3 +691,108 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
 export const servicesRelations = relations(services, ({ one }) => ({
   user: one(users, { fields: [services.userId], references: [users.id] }),
 }));
+
+// ============================================
+// BLOG CMS (SEO-Optimized)
+// ============================================
+
+export const blogPostStatusEnum = pgEnum("blog_post_status", [
+  "draft",
+  "published",
+  "scheduled",
+  "archived",
+]);
+
+// Blog Categories
+export const blogCategories = pgTable("blog_categories", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description"),
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Blog Posts
+export const blogPosts = pgTable("blog_posts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  authorId: uuid("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  categoryId: uuid("category_id").references(() => blogCategories.id, { onDelete: "set null" }),
+
+  // Content
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  excerpt: text("excerpt"), // Short summary for listings
+  content: text("content").notNull(), // Markdown content
+
+  // Media
+  coverImage: text("cover_image"),
+  coverImageAlt: text("cover_image_alt"), // Alt text for SEO
+
+  // SEO Meta Tags
+  metaTitle: text("meta_title"), // Custom title tag (defaults to title if null)
+  metaDescription: text("meta_description"), // Meta description
+  metaKeywords: text("meta_keywords"), // Keywords (comma separated)
+  canonicalUrl: text("canonical_url"), // Custom canonical URL
+
+  // Open Graph
+  ogTitle: text("og_title"),
+  ogDescription: text("og_description"),
+  ogImage: text("og_image"),
+
+  // Publishing
+  status: blogPostStatusEnum("status").notNull().default("draft"),
+  publishedAt: timestamp("published_at"),
+  scheduledAt: timestamp("scheduled_at"),
+
+  // Settings
+  featured: boolean("featured").default(false),
+  allowComments: boolean("allow_comments").default(true),
+
+  // Reading time (auto-calculated)
+  readingTimeMinutes: integer("reading_time_minutes"),
+
+  // Tracking
+  viewCount: integer("view_count").default(0),
+
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Blog Tags
+export const blogTags = pgTable("blog_tags", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Blog Post Tags (Many-to-Many)
+export const blogPostTags = pgTable("blog_post_tags", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  postId: uuid("post_id").notNull().references(() => blogPosts.id, { onDelete: "cascade" }),
+  tagId: uuid("tag_id").notNull().references(() => blogTags.id, { onDelete: "cascade" }),
+});
+
+// Blog Relations
+export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
+  author: one(users, { fields: [blogPosts.authorId], references: [users.id] }),
+  category: one(blogCategories, { fields: [blogPosts.categoryId], references: [blogCategories.id] }),
+  tags: many(blogPostTags),
+}));
+
+export const blogCategoriesRelations = relations(blogCategories, ({ many }) => ({
+  posts: many(blogPosts),
+}));
+
+export const blogTagsRelations = relations(blogTags, ({ many }) => ({
+  posts: many(blogPostTags),
+}));
+
+export const blogPostTagsRelations = relations(blogPostTags, ({ one }) => ({
+  post: one(blogPosts, { fields: [blogPostTags.postId], references: [blogPosts.id] }),
+  tag: one(blogTags, { fields: [blogPostTags.tagId], references: [blogTags.id] }),
+}));

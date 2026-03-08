@@ -12,6 +12,7 @@ import {
   FileSignature,
   Calendar,
   Zap,
+  PenLine,
   Settings,
   HelpCircle,
   LogOut,
@@ -49,6 +50,7 @@ const navItems = [
   { href: "/dashboard/invoices", label: "Invoices", icon: Receipt },
   { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
   { href: "/dashboard/automations", label: "Automations", icon: Zap },
+  { href: "/dashboard/blog", label: "Blog", icon: PenLine },
 ];
 
 const bottomNavItems = [
