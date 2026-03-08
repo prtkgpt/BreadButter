@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -16,7 +16,53 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Plus, Trash2, GripVertical } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, GripVertical, Sparkles, FileText } from "lucide-react";
+import { proposalTemplates } from "@/lib/templates";
+
+const introductionStyles = [
+  {
+    id: "professional",
+    name: "Professional",
+    description: "Formal and business-focused",
+    template: `Dear {{client_name}},
+
+Thank you for considering our services for your upcoming project. We're excited about the opportunity to work with you and help bring your vision to life.
+
+After carefully reviewing your requirements, we've prepared this comprehensive proposal outlining our recommended approach, timeline, and investment. We believe our expertise and commitment to quality make us the ideal partner for this project.`,
+  },
+  {
+    id: "friendly",
+    name: "Friendly & Personal",
+    description: "Warm and approachable tone",
+    template: `Hi {{client_name}}!
+
+Thank you so much for reaching out! I'm thrilled about the possibility of working together on this project.
+
+I've put together this proposal based on our conversation, and I think we can create something truly amazing together. Let me walk you through what I have in mind...`,
+  },
+  {
+    id: "direct",
+    name: "Direct & Concise",
+    description: "Straight to the point",
+    template: `{{client_name}},
+
+Thank you for the opportunity to submit this proposal. Below you'll find our recommended scope, timeline, and pricing.
+
+We're confident we can deliver exceptional results for your project.`,
+  },
+  {
+    id: "creative",
+    name: "Creative & Bold",
+    description: "For creative professionals",
+    template: `Hey {{client_name}},
+
+Let's make something incredible together.
+
+After diving into your project details, I'm genuinely excited about what we can create. This isn't just another project for me—it's a chance to craft something meaningful that will make a real impact.
+
+Here's my vision for bringing your ideas to life...`,
+  },
+];
 
 interface Client {
   id: string;
@@ -254,15 +300,133 @@ function NewProposalForm() {
             </div>
 
             <div className="space-y-2">
-              <Label>Introduction</Label>
+              <div className="flex items-center justify-between">
+                <Label>Introduction</Label>
+                <Select
+                  onValueChange={(styleId) => {
+                    const style = introductionStyles.find((s) => s.id === styleId);
+                    if (style) {
+                      setFormData({ ...formData, introduction: style.template });
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-56">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-amber-500" />
+                      <span className="text-sm">Use template</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {introductionStyles.map((style) => (
+                      <SelectItem key={style.id} value={style.id}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{style.name}</span>
+                          <span className="text-xs text-gray-500">{style.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <Textarea
                 placeholder="Thank you for considering our services..."
                 value={formData.introduction}
                 onChange={(e) =>
                   setFormData({ ...formData, introduction: e.target.value })
                 }
-                rows={4}
+                rows={6}
               />
+              <p className="text-xs text-gray-500">
+                Use {"{{client_name}}"} to personalize with the client&apos;s name
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Professional Sections */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Professional Content Sections
+            </CardTitle>
+            <CardDescription>
+              Add professionally written sections to make your proposal more compelling
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto py-4 px-4 justify-start text-left"
+                onClick={() => {
+                  const section = proposalTemplates[0]?.sections.approach || "";
+                  setFormData({
+                    ...formData,
+                    introduction: formData.introduction + "\n\n" + section,
+                  });
+                }}
+              >
+                <div>
+                  <div className="font-medium">Our Approach</div>
+                  <div className="text-xs text-gray-500">Add a professional methodology section</div>
+                </div>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto py-4 px-4 justify-start text-left"
+                onClick={() => {
+                  const section = proposalTemplates[0]?.sections.whyChooseUs || "";
+                  setFormData({
+                    ...formData,
+                    introduction: formData.introduction + "\n\n" + section,
+                  });
+                }}
+              >
+                <div>
+                  <div className="font-medium">Why Choose Us</div>
+                  <div className="text-xs text-gray-500">Highlight your expertise and value</div>
+                </div>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto py-4 px-4 justify-start text-left"
+                onClick={() => {
+                  const section = proposalTemplates[0]?.sections.nextSteps || "";
+                  setFormData({
+                    ...formData,
+                    introduction: formData.introduction + "\n\n" + section,
+                  });
+                }}
+              >
+                <div>
+                  <div className="font-medium">Next Steps</div>
+                  <div className="text-xs text-gray-500">Clear call-to-action for the client</div>
+                </div>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto py-4 px-4 justify-start text-left"
+                onClick={() => {
+                  const allSections = proposalTemplates[0]?.sections;
+                  if (allSections) {
+                    const fullProposal = `${allSections.introduction}\n\n${allSections.approach}\n\n${allSections.whyChooseUs}\n\n${allSections.nextSteps}`;
+                    setFormData({ ...formData, introduction: fullProposal });
+                  }
+                }}
+              >
+                <div>
+                  <div className="font-medium flex items-center gap-1">
+                    <Sparkles className="h-4 w-4 text-amber-500" />
+                    Complete Proposal
+                  </div>
+                  <div className="text-xs text-gray-500">All professional sections combined</div>
+                </div>
+              </Button>
             </div>
           </CardContent>
         </Card>

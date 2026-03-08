@@ -15,7 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ArrowLeft, FileText, Eye, Briefcase, Camera, Code, Users } from "lucide-react";
+import { contractTemplates as templates } from "@/lib/templates";
 
 interface Client {
   id: string;
@@ -29,83 +37,19 @@ interface Project {
   clientId: string;
 }
 
-const contractTemplates = [
-  {
-    id: "photography",
-    name: "Photography Services",
-    content: [
-      "PHOTOGRAPHY SERVICES AGREEMENT",
-      "",
-      'This Photography Services Agreement ("Agreement") is entered into as of [DATE] between [BUSINESS_NAME] ("Photographer") and [CLIENT_NAME] ("Client").',
-      "",
-      "1. SERVICES",
-      "The Photographer agrees to provide photography services for:",
-      "Event/Session Type: [PROJECT_TYPE]",
-      "Date: [EVENT_DATE]",
-      "Location: [EVENT_LOCATION]",
-      "",
-      "2. PAYMENT",
-      "Total Fee: $[TOTAL_VALUE]",
-      "Payment Schedule:",
-      "- 50% deposit due upon signing",
-      "- Remaining balance due before/on the event date",
-      "",
-      "3. CANCELLATION POLICY",
-      "- Cancellation 30+ days before event: Full deposit refund",
-      "- Cancellation 14-29 days before event: 50% deposit retained",
-      "- Cancellation less than 14 days: Full deposit retained",
-      "",
-      "4. IMAGE RIGHTS",
-      "The Photographer retains copyright to all images. Client receives a personal use license for the delivered images.",
-      "",
-      "5. LIABILITY",
-      "The Photographer's liability is limited to the total amount paid under this Agreement.",
-      "",
-      "By signing below, both parties agree to the terms outlined in this Agreement.",
-      "",
-      "_________________________          _________________________",
-      "Photographer Signature               Client Signature",
-      "",
-      "Date: ________________              Date: ________________",
-    ].join("\n"),
-  },
-  {
-    id: "general",
-    name: "General Services",
-    content: [
-      "GENERAL SERVICES AGREEMENT",
-      "",
-      'This Services Agreement ("Agreement") is entered into as of [DATE] between [BUSINESS_NAME] ("Service Provider") and [CLIENT_NAME] ("Client").',
-      "",
-      "1. SCOPE OF SERVICES",
-      "The Service Provider agrees to provide the following services:",
-      "[PROJECT_DESCRIPTION]",
-      "",
-      "2. COMPENSATION",
-      "Total Fee: $[TOTAL_VALUE]",
-      "Payment Terms: Net 14",
-      "",
-      "3. TERM",
-      "This Agreement begins on [START_DATE] and continues until services are completed.",
-      "",
-      "4. TERMINATION",
-      "Either party may terminate this Agreement with 14 days written notice.",
-      "",
-      "5. CONFIDENTIALITY",
-      "Both parties agree to keep confidential information private.",
-      "",
-      "6. LIABILITY",
-      "Service Provider's liability is limited to the total amount paid under this Agreement.",
-      "",
-      "By signing below, both parties agree to the terms outlined in this Agreement.",
-      "",
-      "_________________________          _________________________",
-      "Service Provider Signature           Client Signature",
-      "",
-      "Date: ________________              Date: ________________",
-    ].join("\n"),
-  },
-];
+const categoryIcons: Record<string, React.ReactNode> = {
+  "General": <Briefcase className="h-5 w-5" />,
+  "Creative": <Camera className="h-5 w-5" />,
+  "Technology": <Code className="h-5 w-5" />,
+  "Professional Services": <Users className="h-5 w-5" />,
+};
+
+const categoryColors: Record<string, string> = {
+  "General": "bg-blue-100 text-blue-700 border-blue-200",
+  "Creative": "bg-purple-100 text-purple-700 border-purple-200",
+  "Technology": "bg-green-100 text-green-700 border-green-200",
+  "Professional Services": "bg-amber-100 text-amber-700 border-amber-200",
+};
 
 function NewContractForm() {
   const router = useRouter();
@@ -117,6 +61,7 @@ function NewContractForm() {
   const [error, setError] = useState("");
   const [clients, setClients] = useState<Client[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [previewTemplate, setPreviewTemplate] = useState<typeof templates[0] | null>(null);
 
   const [formData, setFormData] = useState({
     clientId: preselectedClientId || "",
@@ -139,13 +84,14 @@ function NewContractForm() {
   }, []);
 
   const applyTemplate = (templateId: string) => {
-    const template = contractTemplates.find((t) => t.id === templateId);
+    const template = templates.find((t) => t.id === templateId);
     if (template) {
       setFormData({
         ...formData,
-        title: template.name + " Contract",
+        title: template.name,
         content: template.content,
       });
+      setPreviewTemplate(null);
     }
   };
 
@@ -303,32 +249,93 @@ function NewContractForm() {
             <CardHeader>
               <CardTitle>Start from Template</CardTitle>
               <CardDescription>
-                Choose a template to get started quickly
+                Choose a professionally drafted template with proper legal clauses
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                {contractTemplates.map((template) => (
-                  <Button
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {templates.map((template) => (
+                  <div
                     key={template.id}
-                    type="button"
-                    variant="outline"
-                    className="h-auto py-4 justify-start"
-                    onClick={() => applyTemplate(template.id)}
+                    className="border rounded-lg p-4 hover:border-amber-300 hover:bg-amber-50/50 transition-colors"
                   >
-                    {template.name}
-                  </Button>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-lg bg-gray-100">
+                          {categoryIcons[template.category] || <FileText className="h-5 w-5" />}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{template.name}</h3>
+                          <span className={`text-xs px-2 py-0.5 rounded-full border ${categoryColors[template.category] || "bg-gray-100 text-gray-600"}`}>
+                            {template.category}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-4 line-clamp-2">
+                      {template.id === "freelance-services" && "Complete freelance agreement with IP rights, payment terms, and liability clauses."}
+                      {template.id === "photography" && "Photography contract covering usage rights, cancellation policy, and deliverables."}
+                      {template.id === "web-development" && "Web development agreement with milestones, revision rounds, and technical specs."}
+                      {template.id === "consulting" && "Professional consulting contract with confidentiality and non-solicitation terms."}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPreviewTemplate(template)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Preview
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => applyTemplate(template.id)}
+                      >
+                        Use Template
+                      </Button>
+                    </div>
+                  </div>
                 ))}
               </div>
             </CardContent>
           </Card>
+
+          {/* Template Preview Dialog */}
+          <Dialog open={!!previewTemplate} onOpenChange={() => setPreviewTemplate(null)}>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  {previewTemplate && categoryIcons[previewTemplate.category]}
+                  {previewTemplate?.name}
+                </DialogTitle>
+                <DialogDescription>
+                  Preview the contract template before using it
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto mt-4">
+                <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 p-6 rounded-lg border text-gray-700">
+                  {previewTemplate?.content}
+                </pre>
+              </div>
+              <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
+                <Button variant="outline" onClick={() => setPreviewTemplate(null)}>
+                  Close
+                </Button>
+                <Button onClick={() => previewTemplate && applyTemplate(previewTemplate.id)}>
+                  Use This Template
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Contract Content */}
           <Card>
             <CardHeader>
               <CardTitle>Contract Content</CardTitle>
               <CardDescription>
-                Write or edit your contract terms. Use placeholders like [CLIENT_NAME] for dynamic content.
+                Edit your contract terms. Variables like {"{{client_name}}"} will be replaced with actual values when the contract is generated.
               </CardDescription>
             </CardHeader>
             <CardContent>
