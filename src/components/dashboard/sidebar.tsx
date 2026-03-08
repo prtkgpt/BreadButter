@@ -18,6 +18,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Package,
 } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
@@ -48,6 +49,7 @@ const navItems = [
   { href: "/dashboard/proposals", label: "Proposals", icon: FileText },
   { href: "/dashboard/contracts", label: "Contracts", icon: FileSignature },
   { href: "/dashboard/invoices", label: "Invoices", icon: Receipt },
+  { href: "/dashboard/services", label: "Services", icon: Package },
   { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
   { href: "/dashboard/automations", label: "Automations", icon: Zap },
   { href: "/dashboard/blog", label: "Blog", icon: PenLine },

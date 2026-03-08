@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { projects, clients, invoices, contracts, proposals } from "@/lib/schema";
+import { projects, clients, invoices, contracts, proposals, milestones } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
   Receipt,
   Plus,
 } from "lucide-react";
+import { MilestonesSection } from "@/components/projects/milestones-section";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,11 @@ export default async function ProjectDetailPage({
 
   const projectProposals = await db.query.proposals.findMany({
     where: eq(proposals.projectId, id),
+  });
+
+  const projectMilestones = await db.query.milestones.findMany({
+    where: eq(milestones.projectId, id),
+    orderBy: (milestones, { asc }) => [asc(milestones.sortOrder)],
   });
 
   const totalValue = Number(project.totalValue) || 0;
@@ -152,6 +158,20 @@ export default async function ProjectDetailPage({
               )}
             </CardContent>
           </Card>
+
+          {/* Milestones */}
+          <MilestonesSection
+            projectId={id}
+            clientId={project.clientId}
+            milestones={projectMilestones.map(m => ({
+              ...m,
+              dueDate: m.dueDate ? m.dueDate.toString() : null,
+              submittedAt: m.submittedAt ? m.submittedAt.toISOString() : null,
+              approvedAt: m.approvedAt ? m.approvedAt.toISOString() : null,
+              paidAt: m.paidAt ? m.paidAt.toISOString() : null,
+              deliverables: (m.deliverables as string[]) || [],
+            }))}
+          />
 
           {/* Invoices */}
           <Card>

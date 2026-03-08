@@ -796,3 +796,95 @@ export const blogPostTagsRelations = relations(blogPostTags, ({ one }) => ({
   post: one(blogPosts, { fields: [blogPostTags.postId], references: [blogPosts.id] }),
   tag: one(blogTags, { fields: [blogPostTags.tagId], references: [blogTags.id] }),
 }));
+
+// ============================================
+// MILESTONES & ESCROW
+// ============================================
+
+export const milestoneStatusEnum = pgEnum("milestone_status", [
+  "pending",
+  "in_progress",
+  "submitted",
+  "revision_requested",
+  "approved",
+  "paid",
+]);
+
+export const escrowStatusEnum = pgEnum("escrow_status", [
+  "pending",
+  "funded",
+  "released",
+  "refunded",
+  "disputed",
+]);
+
+// Project Milestones
+export const milestones = pgTable("milestones", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  projectId: uuid("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  dueDate: date("due_date"),
+  status: milestoneStatusEnum("status").default("pending").notNull(),
+  sortOrder: integer("sort_order").default(0),
+  deliverables: jsonb("deliverables").$type<string[]>().default([]),
+  submittedAt: timestamp("submitted_at"),
+  approvedAt: timestamp("approved_at"),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Escrow Transactions
+export const escrowTransactions = pgTable("escrow_transactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  milestoneId: uuid("milestone_id")
+    .notNull()
+    .references(() => milestones.id, { onDelete: "cascade" }),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  platformFee: decimal("platform_fee", { precision: 10, scale: 2 }).default("0"),
+  status: escrowStatusEnum("status").default("pending").notNull(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeTransferId: text("stripe_transfer_id"),
+  fundedAt: timestamp("funded_at"),
+  releasedAt: timestamp("released_at"),
+  refundedAt: timestamp("refunded_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Milestone Relations
+export const milestonesRelations = relations(milestones, ({ one, many }) => ({
+  project: one(projects, { fields: [milestones.projectId], references: [projects.id] }),
+  escrowTransactions: many(escrowTransactions),
+}));
+
+export const escrowTransactionsRelations = relations(escrowTransactions, ({ one }) => ({
+  milestone: one(milestones, { fields: [escrowTransactions.milestoneId], references: [milestones.id] }),
+  user: one(users, { fields: [escrowTransactions.userId], references: [users.id] }),
+  client: one(clients, { fields: [escrowTransactions.clientId], references: [clients.id] }),
+}));
+
+// E-Signature tracking
+export const signatures = pgTable("signatures", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  entityType: text("entity_type").notNull(), // proposal, contract
+  entityId: uuid("entity_id").notNull(),
+  signerType: text("signer_type").notNull(), // owner, client
+  signerName: text("signer_name").notNull(),
+  signerEmail: text("signer_email").notNull(),
+  signatureData: text("signature_data").notNull(), // base64 signature image
+  signedAt: timestamp("signed_at").defaultNow().notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
